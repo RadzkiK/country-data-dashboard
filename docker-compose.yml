@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:8
+    container_name: country-dashboard-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: country_dashboard
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
