@@ -25,4 +25,10 @@ class CountryController(
     @GetMapping("/compare")
     fun compare(@RequestParam codes: List<String>): List<CountrySnapshot> =
         service.compare(codes)
+
+    @GetMapping("/{code}/history")
+    fun getHistory(
+        @PathVariable code: String,
+        @RequestParam(defaultValue = "20") limit: Int
+    ): List<CountrySnapshot> = service.getHistory(code, limit)
 }

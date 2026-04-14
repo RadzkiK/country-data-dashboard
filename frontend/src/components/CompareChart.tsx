@@ -9,11 +9,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { CountryDashboard } from "../types/country";
+import type { CountrySnapshot } from "../types/country";
 import { formatNumber, formatTemperature } from "../utils/format";
 
 type Props = {
-  countries: CountryDashboard[];
+  countries: CountrySnapshot[];
 };
 
 type MetricKey = "gdpPerCapita" | "lifeExpectancy" | "temperature" | "population";
@@ -29,7 +29,7 @@ export default function CompareChart({ countries }: Props) {
   const [metric, setMetric] = useState<MetricKey>("gdpPerCapita");
 
   const data = countries.map((country) => ({
-    name: country.name,
+    name: country.countryName,
     code: country.countryCode,
     gdpPerCapita: country.indicators?.gdpPerCapita ?? 0,
     lifeExpectancy: country.indicators?.lifeExpectancy ?? 0,
@@ -86,7 +86,10 @@ export default function CompareChart({ countries }: Props) {
                 border: "1px solid #d6dfd6",
                 boxShadow: "0 18px 40px rgba(24, 42, 33, 0.12)",
               }}
-              formatter={(value: number | undefined) => value !== undefined ? formatTooltipValue(metric, value) : ""}
+              formatter={(value) => {
+                if (typeof value !== "number") return "";
+                return formatTooltipValue(metric, value);
+              }}
               labelFormatter={(_, payload) => {
                 const entry = payload?.[0]?.payload;
                 return entry ? `${entry.name} (${entry.code})` : "";

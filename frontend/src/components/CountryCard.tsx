@@ -1,4 +1,4 @@
-import type { CountryDashboard } from "../types/country";
+import type { CountrySnapshot } from "../types/country";
 import {
   formatDateTime,
   formatNumber,
@@ -7,7 +7,7 @@ import {
 } from "../utils/format";
 
 type Props = {
-  country: CountryDashboard;
+  country: CountrySnapshot;
 };
 
 export default function CountryCard({ country }: Props) {
@@ -16,12 +16,12 @@ export default function CountryCard({ country }: Props) {
       <header className="country-card-header">
         <div className="country-title-group">
           {country.flagUrl ? (
-            <img className="country-flag" src={country.flagUrl} alt={`Flaga ${country.name}`} />
+            <img className="country-flag" src={country.flagUrl} alt={`Flaga ${country.countryName}`} />
           ) : (
             <div className="country-flag-placeholder">{country.countryCode}</div>
           )}
           <div>
-            <h3>{country.name}</h3>
+            <h3>{country.countryName}</h3>
             <p>
               {country.countryCode} · {country.capital}
             </p>
@@ -84,7 +84,7 @@ export default function CountryCard({ country }: Props) {
         </div>
         <div>
           <dt>Ostatnia aktualizacja</dt>
-          <dd>{formatDateTime(country.lastUpdated)}</dd>
+          <dd>{formatDateTime(country.fetchedAt)}</dd>
         </div>
       </dl>
     </article>
