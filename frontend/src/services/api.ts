@@ -57,10 +57,23 @@ function normalizeCountrySnapshot(raw: unknown): CountrySnapshot {
     countryCode: typeof item.countryCode === "string" ? item.countryCode : "",
     countryName: typeof item.countryName === "string" ? item.countryName : "",
     capital: typeof item.capital === "string" ? item.capital : "-",
+    flagUrl: normalizeFlagUrl(item.flagUrl, item.countryCode),
     languages: normalizeStringArray(item.languages),
     currencies: normalizeStringArray(item.currencies),
     fetchedAt: normalizeTimestamp(item.fetchedAt),
   };
+}
+
+function normalizeFlagUrl(flagUrl: unknown, countryCode: unknown): string | undefined {
+  if (typeof flagUrl === "string" && flagUrl.trim()) {
+    return flagUrl;
+  }
+
+  if (typeof countryCode !== "string" || countryCode.length !== 2) {
+    return undefined;
+  }
+
+  return `https://flagcdn.com/w80/${countryCode.toLowerCase()}.png`;
 }
 
 function normalizeCountrySnapshotList(raw: unknown): CountrySnapshot[] {

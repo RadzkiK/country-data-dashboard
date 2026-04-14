@@ -237,9 +237,13 @@ h3 {
 
 .content-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.85fr);
   gap: 24px;
   margin-top: 24px;
+}
+
+.content-grid-single {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .panel-stack {
@@ -254,6 +258,31 @@ h3 {
 
 .details-panel {
   min-height: 100%;
+}
+
+.selector-panel {
+  padding-bottom: 32px;
+}
+
+.compact-country-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.selector-divider {
+  height: 1px;
+  margin-bottom: 18px;
+  background: linear-gradient(90deg, transparent 0%, rgba(201, 192, 175, 0.8) 14%, rgba(201, 192, 175, 0.8) 86%, transparent 100%);
+}
+
+.analytics-pill {
+  margin-bottom: 16px;
+}
+
+.compact-empty-state {
+  margin-top: 16px;
 }
 
 .section-heading {
@@ -290,6 +319,52 @@ h3 {
   gap: 18px;
 }
 
+.selector-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.control-group {
+  display: grid;
+  gap: 6px;
+}
+
+.control-group span {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-soft);
+}
+
+.control-group input,
+.control-group select {
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 253, 248, 0.94);
+  padding: 0 10px;
+  color: var(--text);
+}
+
+.control-group-search {
+  grid-column: span 3;
+}
+
+.control-group-area {
+  margin-right: 14px;
+}
+
+.control-group-gdp {
+  margin-left: 14px;
+}
+
+.range-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
 .selected-strip {
   display: flex;
   flex-wrap: wrap;
@@ -315,8 +390,11 @@ h3 {
 
 .selector-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 12px;
+  max-height: 560px;
+  overflow: auto;
+  padding-right: 4px;
 }
 
 .country-option {
@@ -405,6 +483,40 @@ h3 {
   box-shadow: var(--shadow-md);
 }
 
+.country-card-compact {
+  gap: 10px;
+  padding: 14px;
+}
+
+.country-card-compact .country-flag,
+.country-card-compact .country-flag-placeholder {
+  width: 44px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.country-card-compact h3 {
+  font-size: 1rem;
+}
+
+.metric-grid-compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.metric-grid-compact .metric-tile {
+  padding: 10px;
+}
+
+.metric-grid-compact .metric-tile strong {
+  font-size: 0.92rem;
+}
+
+.compact-update-row {
+  color: var(--text-soft);
+  font-size: 0.78rem;
+}
+
 .country-card-header,
 .country-title-group {
   display: flex;
@@ -477,6 +589,20 @@ h3 {
     grid-template-columns: 1fr;
   }
 
+  .selector-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .control-group-search {
+    grid-column: span 2;
+  }
+
+  .control-group-area,
+  .control-group-gdp {
+    margin: 0;
+    margin-right: 5px;
+  }
+
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -497,6 +623,19 @@ h3 {
   .summary-grid,
   .metric-grid {
     grid-template-columns: 1fr;
+  }
+
+  .selector-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .control-group-search {
+    grid-column: span 1;
+  }
+
+  .control-group-area,
+  .control-group-gdp {
+    margin: 0;
   }
 
   .section-heading,
@@ -697,6 +836,16 @@ h3 {
 
 .compare-history-section {
   margin-bottom: 24px;
+}
+
+.compare-analytics-section {
+  margin-bottom: 24px;
+}
+
+.compare-meta-note {
+  margin-top: 6px;
+  color: var(--text-soft);
+  font-size: 0.88rem;
 }
 
 .chart-wrapper-lg {

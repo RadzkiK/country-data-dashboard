@@ -21,7 +21,7 @@ type MetricKey = "gdpPerCapita" | "lifeExpectancy" | "temperature" | "population
 const metricOptions: Array<{ key: MetricKey; label: string; color: string }> = [
   { key: "gdpPerCapita", label: "PKB per capita", color: "#14532d" },
   { key: "lifeExpectancy", label: "Długość życia", color: "#0f766e" },
-  { key: "temperature", label: "Temperatura", color: "#b45309" },
+  { key: "temperature", label: "Temperatura stolicy", color: "#b45309" },
   { key: "population", label: "Populacja", color: "#1d4ed8" },
 ];
 

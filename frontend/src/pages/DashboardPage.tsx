@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CompareChart from "../components/CompareChart";
 import CountryCard from "../components/CountryCard";
 import CountrySelector from "../components/CountrySelector";
 import { compareCountries, getCountries, refreshCountry } from "../services/api";
@@ -86,9 +85,6 @@ export default function DashboardPage() {
   const summary = useMemo(() => {
     const totalPopulation = compared.reduce((sum, country) => sum + (country.population ?? 0), 0);
     const avgTemperature = average(compared.map((country) => country.weather?.temperature));
-    const avgLifeExpectancy = average(
-      compared.map((country) => country.indicators?.lifeExpectancy),
-    );
     const avgGdp = average(compared.map((country) => country.indicators?.gdpPerCapita));
     const lastUpdated = compared
       .map((country) => country.fetchedAt)
@@ -99,7 +95,6 @@ export default function DashboardPage() {
     return {
       totalPopulation,
       avgTemperature,
-      avgLifeExpectancy,
       avgGdp,
       lastUpdated,
     };
@@ -156,74 +151,50 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      <section className="content-grid">
-        <div className="panel-stack">
-          <section className="surface-card">
-            <div className="section-heading">
-              <div>
-                <p className="section-label">Selekcja</p>
-                <h2>Wybór krajów do porównania</h2>
-              </div>
-              <span className="muted-pill">Maksymalnie 3 kraje</span>
-            </div>
-            <CountrySelector
-              countries={countries}
-              selectedCodes={selectedCodes}
-              onSelectionChange={setSelectedCodes}
-              onCompare={handleCompare}
-              disabled={status === "loading"}
-            />
-          </section>
-
-          <section className="surface-card">
-            <div className="section-heading">
-              <div>
-                <p className="section-label">Analityka</p>
-                <h2>Porównanie wskaźników</h2>
-              </div>
-              <span className="muted-pill">
-                Średnia długość życia:{" "}
-                {summary.avgLifeExpectancy ? `${summary.avgLifeExpectancy.toFixed(1)} lat` : "-"}
-              </span>
-            </div>
-            <CompareChart countries={compared} />
-          </section>
-        </div>
-
-        <section className="surface-card details-panel">
+      <section className="content-grid content-grid-single">
+        <section className="surface-card selector-panel">
           <div className="section-heading">
             <div>
-              <p className="section-label">Kraje</p>
-              <h2>Karty informacyjne</h2>
+              <p className="section-label">Selekcja</p>
+              <h2>Wybór krajów do porównania</h2>
             </div>
-            {errorMessage ? <span className="error-badge">{errorMessage}</span> : null}
+            <span className="muted-pill">Maksymalnie 3 kraje</span>
           </div>
 
+          {status === "ready" && compared.length > 0 ? (
+            <div className="compact-country-grid">
+              {compared.map((country) => (
+                <CountryCard key={country.countryCode} country={country} compact />
+              ))}
+            </div>
+          ) : null}
+
+          <div className="selector-divider" />
+
+          <CountrySelector
+            countries={countries}
+            selectedCodes={selectedCodes}
+            onSelectionChange={setSelectedCodes}
+            onCompare={handleCompare}
+            disabled={status === "loading"}
+          />
+
           {status === "loading" ? (
-            <div className="empty-state">
+            <div className="empty-state compact-empty-state">
               <h3>Ładowanie danych...</h3>
               <p>Trwa pobieranie listy krajów z backendu.</p>
             </div>
-          ) : status === "error" ? (
-            <div className="empty-state error-state">
+          ) : null}
+
+          {status === "error" ? (
+            <div className="empty-state error-state compact-empty-state">
               <h3>Nie udało się załadować danych</h3>
               <p>{errorMessage}</p>
               <button className="secondary-button" type="button" onClick={() => void loadCountries()}>
                 Spróbuj ponownie
               </button>
             </div>
-          ) : compared.length === 0 ? (
-            <div className="empty-state">
-              <h3>Brak danych do porównania</h3>
-              <p>Wybierz co najmniej jeden kraj, aby wyświetlić szczegóły.</p>
-            </div>
-          ) : (
-            <div className="country-grid">
-              {compared.map((country) => (
-                <CountryCard key={country.countryCode} country={country} />
-              ))}
-            </div>
-          )}
+          ) : null}
         </section>
       </section>
     </main>

@@ -10,19 +10,19 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import CompareChart from "../components/CompareChart";
 import { compareCountries, getCountryHistory } from "../services/api";
 import type { CountrySnapshot } from "../types/country";
 import { formatDateTime, formatNumber, formatTemperature } from "../utils/format";
 
 const HISTORY_LIMIT = 30;
 
-type MetricKey = "gdpPerCapita" | "lifeExpectancy" | "co2PerCapita" | "temperature";
+type MetricKey = "gdpPerCapita" | "lifeExpectancy" | "temperature";
 
 const metricOptions: Array<{ key: MetricKey; label: string; unit: string }> = [
   { key: "gdpPerCapita", label: "PKB per capita", unit: "USD" },
   { key: "lifeExpectancy", label: "Długość życia", unit: "lat" },
-  { key: "co2PerCapita", label: "CO2 per capita", unit: "t" },
-  { key: "temperature", label: "Temperatura", unit: "°C" },
+  { key: "temperature", label: "Temperatura stolicy", unit: "°C" },
 ];
 
 const COUNTRY_COLORS = ["#14532d", "#b45309", "#1d4ed8", "#7c3aed"];
@@ -115,7 +115,6 @@ export default function ComparePage() {
   const formatYAxis = (value: number): string => {
     if (metric === "temperature") return `${Math.round(value)}°`;
     if (metric === "lifeExpectancy") return `${Math.round(value)}`;
-    if (metric === "co2PerCapita") return `${value.toFixed(1)}`;
     return `$${formatNumber(value)}`;
   };
 
@@ -149,9 +148,7 @@ export default function ComparePage() {
         </button>
         <div className="compare-page-title">
           <p className="eyebrow">Porównanie szczegółowe</p>
-          <h1 className="compare-h1">
-            {currentData.map((c) => c.countryName).join(" vs ")}
-          </h1>
+          <h1 className="compare-h1">{currentData.map((c) => c.countryName).join(" vs ")}</h1>
         </div>
       </section>
 
@@ -199,7 +196,7 @@ export default function ComparePage() {
                 </strong>
               </div>
               <div className="compare-stat-row">
-                <span>Dług. życia</span>
+                <span>Długość życia</span>
                 <strong>
                   {country.indicators?.lifeExpectancy
                     ? `${country.indicators.lifeExpectancy.toFixed(1)} lat`
@@ -207,15 +204,7 @@ export default function ComparePage() {
                 </strong>
               </div>
               <div className="compare-stat-row">
-                <span>CO2 per capita</span>
-                <strong>
-                  {country.indicators?.co2PerCapita
-                    ? `${country.indicators.co2PerCapita.toFixed(2)} t`
-                    : "-"}
-                </strong>
-              </div>
-              <div className="compare-stat-row">
-                <span>Temperatura</span>
+                <span>Temperatura stolicy</span>
                 <strong>{formatTemperature(country.weather?.temperature)}</strong>
               </div>
               <p className="compare-last-updated">
@@ -226,11 +215,23 @@ export default function ComparePage() {
         ))}
       </div>
 
+      <section className="surface-card compare-analytics-section">
+        <div className="section-heading">
+          <div>
+            <p className="section-label">Analityka</p>
+            <h2>Porównanie wskaźników</h2>
+            <p className="compare-meta-note">Temperatura na wykresach dotyczy stolicy kraju.</p>
+          </div>
+        </div>
+        <CompareChart countries={currentData} />
+      </section>
+
       <section className="surface-card compare-history-section">
         <div className="section-heading">
           <div>
             <p className="section-label">Historia</p>
             <h2>Dane historyczne</h2>
+            <p className="compare-meta-note">Temperatura na wykresach dotyczy stolicy kraju.</p>
           </div>
           <div className="chart-toolbar">
             {metricOptions.map((opt) => (
@@ -325,9 +326,7 @@ export default function ComparePage() {
                 <th>Wskaźnik</th>
                 {currentData.map((c) => (
                   <th key={c.countryCode}>
-                    {c.flagUrl ? (
-                      <img src={c.flagUrl} alt="" className="table-flag" />
-                    ) : null}
+                    {c.flagUrl ? <img src={c.flagUrl} alt="" className="table-flag" /> : null}
                     {c.countryName}
                   </th>
                 ))}
@@ -337,9 +336,7 @@ export default function ComparePage() {
               <tr>
                 <td>Populacja</td>
                 {currentData.map((c) => (
-                  <td key={c.countryCode}>
-                    {c.population ? formatNumber(c.population) : "-"}
-                  </td>
+                  <td key={c.countryCode}>{c.population ? formatNumber(c.population) : "-"}</td>
                 ))}
               </tr>
               <tr>
@@ -369,17 +366,7 @@ export default function ComparePage() {
                 ))}
               </tr>
               <tr>
-                <td>CO2 per capita</td>
-                {currentData.map((c) => (
-                  <td key={c.countryCode}>
-                    {c.indicators?.co2PerCapita
-                      ? `${c.indicators.co2PerCapita.toFixed(2)} t`
-                      : "-"}
-                  </td>
-                ))}
-              </tr>
-              <tr>
-                <td>Temperatura</td>
+                <td>Temperatura stolicy</td>
                 {currentData.map((c) => (
                   <td key={c.countryCode}>{formatTemperature(c.weather?.temperature)}</td>
                 ))}

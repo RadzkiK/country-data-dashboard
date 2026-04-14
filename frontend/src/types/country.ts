@@ -8,7 +8,6 @@ export interface WeatherSnapshot {
 export interface IndicatorSnapshot {
   gdpPerCapita?: number;
   lifeExpectancy?: number;
-  co2PerCapita?: number;
   year?: number;
 }
 
