@@ -1,9 +1,10 @@
-import type { CountryDashboard } from "../types/country";
+import type { CountrySnapshot } from "../types/country";
 
 type Props = {
-  countries: CountryDashboard[];
+  countries: CountrySnapshot[];
   selectedCodes: string[];
   onSelectionChange: (codes: string[]) => void;
+  onCompare?: () => void;
   disabled?: boolean;
 };
 
@@ -11,6 +12,7 @@ export default function CountrySelector({
   countries,
   selectedCodes,
   onSelectionChange,
+  onCompare,
   disabled = false,
 }: Props) {
   const handleToggle = (code: string) => {
@@ -42,8 +44,16 @@ export default function CountrySelector({
                 className="selected-chip"
                 type="button"
                 onClick={() => handleToggle(code)}
+                title="Kliknij, aby usunąć"
               >
-                <span>{country?.name ?? code}</span>
+                {country?.flagUrl ? (
+                  <img
+                    src={country.flagUrl}
+                    alt={`Flaga ${country.countryName}`}
+                    className="chip-flag"
+                  />
+                ) : null}
+                <span>{country?.countryName ?? code}</span>
                 <strong>{code}</strong>
               </button>
             );
@@ -52,6 +62,20 @@ export default function CountrySelector({
           <p className="helper-text">Nie wybrano jeszcze żadnego kraju.</p>
         )}
       </div>
+
+      {selectedCodes.length >= 2 && onCompare ? (
+        <div className="compare-action-row">
+          <button
+            className="primary-button compare-button"
+            type="button"
+            onClick={onCompare}
+            disabled={disabled}
+          >
+            Porównaj kraje →
+          </button>
+          <span className="compare-hint">Otwórz szczegółowe porównanie z wykresami historycznymi</span>
+        </div>
+      ) : null}
 
       <div className="selector-grid">
         {countries.map((country) => {
@@ -66,13 +90,22 @@ export default function CountrySelector({
               onClick={() => handleToggle(country.countryCode)}
               disabled={disabled || isLocked}
             >
-              <div>
-                <strong>{country.name}</strong>
-                <span>
-                  {country.countryCode} · {country.capital}
-                </span>
+              <div className="country-option-left">
+                {country.flagUrl ? (
+                  <img
+                    src={country.flagUrl}
+                    alt={`Flaga ${country.countryName}`}
+                    className="option-flag"
+                  />
+                ) : (
+                  <div className="option-flag-placeholder">{country.countryCode}</div>
+                )}
+                <div>
+                  <strong>{country.countryName}</strong>
+                  <span>{country.capital}</span>
+                </div>
               </div>
-              <small>{country.region ?? "Brak regionu"}</small>
+              <small className="option-region">{country.region ?? "Brak regionu"}</small>
             </button>
           );
         })}

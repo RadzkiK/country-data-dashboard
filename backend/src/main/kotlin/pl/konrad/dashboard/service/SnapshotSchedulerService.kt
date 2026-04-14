@@ -52,6 +52,9 @@ class SnapshotSchedulerService(
         codes.mapNotNull { code ->
             repository.findTopByCountryCodeOrderByFetchedAtDesc(code.uppercase())
         }
+
+    fun getHistory(code: String, limit: Int): List<CountrySnapshot> =
+        repository.findByCountryCodeOrderByFetchedAtDesc(code.uppercase()).take(limit)
 }
 
 @Service

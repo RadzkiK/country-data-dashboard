@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CompareChart from "../components/CompareChart";
 import CountryCard from "../components/CountryCard";
 import CountrySelector from "../components/CountrySelector";
 import { compareCountries, getCountries, refreshCountry } from "../services/api";
-import type { CountryDashboard } from "../types/country";
+import type { CountrySnapshot } from "../types/country";
 import {
   formatCompactNumber,
   formatDateTime,
@@ -14,9 +15,10 @@ import {
 type Status = "idle" | "loading" | "ready" | "error";
 
 export default function DashboardPage() {
-  const [countries, setCountries] = useState<CountryDashboard[]>([]);
+  const navigate = useNavigate();
+  const [countries, setCountries] = useState<CountrySnapshot[]>([]);
   const [selectedCodes, setSelectedCodes] = useState<string[]>(["PL", "DE", "CZ"]);
-  const [compared, setCompared] = useState<CountryDashboard[]>([]);
+  const [compared, setCompared] = useState<CountrySnapshot[]>([]);
   const [status, setStatus] = useState<Status>("loading");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -31,6 +33,7 @@ export default function DashboardPage() {
     } else {
       setCompared([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCodes]);
 
   const loadCountries = async () => {
@@ -74,6 +77,12 @@ export default function DashboardPage() {
     }
   };
 
+  const handleCompare = () => {
+    if (selectedCodes.length >= 2) {
+      navigate(`/compare?codes=${selectedCodes.join(",")}`);
+    }
+  };
+
   const summary = useMemo(() => {
     const totalPopulation = compared.reduce((sum, country) => sum + (country.population ?? 0), 0);
     const avgTemperature = average(compared.map((country) => country.weather?.temperature));
@@ -82,7 +91,7 @@ export default function DashboardPage() {
     );
     const avgGdp = average(compared.map((country) => country.indicators?.gdpPerCapita));
     const lastUpdated = compared
-      .map((country) => country.lastUpdated)
+      .map((country) => country.fetchedAt)
       .filter(Boolean)
       .sort()
       .at(-1);
@@ -161,6 +170,7 @@ export default function DashboardPage() {
               countries={countries}
               selectedCodes={selectedCodes}
               onSelectionChange={setSelectedCodes}
+              onCompare={handleCompare}
               disabled={status === "loading"}
             />
           </section>

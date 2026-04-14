@@ -12,10 +12,10 @@ export interface IndicatorSnapshot {
   year?: number;
 }
 
-export interface CountryDashboard {
+export interface CountrySnapshot {
   id?: string;
   countryCode: string;
-  name: string;
+  countryName: string;
   capital: string;
   region?: string;
   population?: number;
@@ -25,5 +25,8 @@ export interface CountryDashboard {
   currencies: string[];
   weather?: WeatherSnapshot;
   indicators?: IndicatorSnapshot;
-  lastUpdated: string;
+  fetchedAt: string;
 }
+
+/** @deprecated Use CountrySnapshot instead */
+export type CountryDashboard = CountrySnapshot;
