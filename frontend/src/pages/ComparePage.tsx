@@ -14,6 +14,8 @@ import { compareCountries, getCountryHistory } from "../services/api";
 import type { CountrySnapshot } from "../types/country";
 import { formatDateTime, formatNumber, formatTemperature } from "../utils/format";
 
+const HISTORY_LIMIT = 30;
+
 type MetricKey = "gdpPerCapita" | "lifeExpectancy" | "co2PerCapita" | "temperature";
 
 const metricOptions: Array<{ key: MetricKey; label: string; unit: string }> = [
@@ -49,7 +51,7 @@ export default function ComparePage() {
 
       const [current, ...histories] = await Promise.all([
         compareCountries(codes),
-        ...codes.map((code) => getCountryHistory(code, 30)),
+        ...codes.map((code) => getCountryHistory(code, HISTORY_LIMIT)),
       ]);
 
       setCurrentData(current);
