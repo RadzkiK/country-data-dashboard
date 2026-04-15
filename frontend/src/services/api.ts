@@ -102,7 +102,8 @@ export const getCountriesGrouped = async (): Promise<Record<string, CountrySnaps
 };
 
 export const refreshCountry = async (code: string): Promise<CountrySnapshot> => {
-  const response = await api.post(`/countries/${code}/refresh`);
+  const normalizedCode = code.trim().toUpperCase();
+  const response = await api.post(`/countries/${normalizedCode}/refresh`, null);
   return normalizeCountrySnapshot(response.data);
 };
 

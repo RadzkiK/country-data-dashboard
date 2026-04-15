@@ -164,9 +164,29 @@ POST /api/countries/PL/refresh
 
 **Status Codes**:
 - `200 OK` - Dane odświeżone pomyślnie
+- `400 Bad Request` - Błąd zwrócony przez zewnętrzne API dla danego kraju lub wskaźnika
 - `500 Internal Server Error` - Błąd podczas pobierania danych z API zewnętrznych
 
 **Uwaga**: Ta operacja może potrwać kilka sekund ze względu na wywołania do zewnętrznych API.
+
+### Diagnostyka błędów `400` dla `/refresh`
+
+Backend loguje szczegóły odświeżenia i błędów zewnętrznych źródeł. Dla każdego wywołania zobaczysz:
+
+- start i zakończenie ręcznego odświeżenia,
+- kod kraju,
+- źródło błędu (`rest-countries.alpha`, `open-meteo.geocode`, `open-meteo.forecast`, `world-bank.<indicator>`),
+- kod HTTP oraz skrócone body odpowiedzi z API zewnętrznego.
+
+Przykładowe wpisy w logach:
+
+```text
+INFO  ... Manual refresh started for country=PL
+ERROR ... External call failed country=PL source=world-bank.NY.GDP.PCAP.CD status=400 body={...}
+ERROR ... Manual refresh failed for country=PL
+```
+
+Najczęstsza interpretacja: endpoint `/api/countries/{code}/refresh` działa poprawnie, ale konkretne zewnętrzne źródło odrzuca zapytanie dla danego kraju lub wskaźnika.
 
 ---
 

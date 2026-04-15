@@ -3,11 +3,13 @@ package pl.konrad.dashboard.service
 import RestCountryDto
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestClientResponseException
 import pl.konrad.dashboard.client.OpenMeteoClient
 import pl.konrad.dashboard.client.RestCountriesClient
 import pl.konrad.dashboard.client.WorldBankClient
 import pl.konrad.dashboard.model.*
 import pl.konrad.dashboard.repository.CountrySnapshotRepository
+import org.slf4j.LoggerFactory
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -17,9 +19,13 @@ class SnapshotSchedulerService(
     private val repository: CountrySnapshotRepository
 ) {
 
+    private val log = LoggerFactory.getLogger(javaClass)
+
     @Scheduled(fixedRate = 600_000) // 10 minut
     fun fetchSnapshotsPeriodically() {
+        log.info("Starting scheduled snapshots refresh")
         countryIngestionService.fetchAllCountriesSnapshots()
+        log.info("Finished scheduled snapshots refresh")
     }
 
     fun refreshCountry(code: String): CountrySnapshot {
@@ -65,40 +71,81 @@ class CountryIngestionService(
     private val repository: CountrySnapshotRepository
 ) {
 
+    private val log = LoggerFactory.getLogger(javaClass)
+
     fun fetchAllCountriesSnapshots() {
         val fetchedAt = Clock.System.now()
         val countries = restCountriesClient.getAllCountries()
+
+        log.info("Starting full ingestion for {} countries", countries.size)
 
         countries.forEach { country ->
             runCatching {
                 val snapshot = buildSnapshot(country, fetchedAt)
                 repository.save(snapshot)
             }.onFailure {
-                println("Failed for country ${country.cca2}: ${it.message}")
+                log.error(
+                    "Failed periodic ingestion for country code={} name={}",
+                    country.cca2,
+                    country.name?.common,
+                    it,
+                )
             }
         }
+
+        log.info("Finished full ingestion for {} countries", countries.size)
     }
 
     fun fetchCountrySnapshot(code: String): CountrySnapshot {
         val fetchedAt = Clock.System.now()
-        val country = restCountriesClient.getCountryByCode(code).first() as RestCountryDto
-        return buildSnapshot(country, fetchedAt)
+        val normalizedCode = code.trim().uppercase()
+
+        log.info("Manual refresh started for country={}", normalizedCode)
+
+        return runCatching {
+            val country = tracedCall(normalizedCode, "rest-countries.alpha") {
+                restCountriesClient.getCountryByCode(normalizedCode).first() as RestCountryDto
+            }
+
+            buildSnapshot(country, fetchedAt)
+        }.onSuccess {
+            log.info("Manual refresh finished successfully for country={}", normalizedCode)
+        }.onFailure {
+            log.error("Manual refresh failed for country={}", normalizedCode, it)
+        }.getOrThrow()
     }
 
     fun buildSnapshot(country: RestCountryDto, fetchedAt: Instant): CountrySnapshot {
+        val countryCode = country.cca2 ?: "UNKNOWN"
         val capital = country.capital?.firstOrNull().orEmpty()
 
-        val geo = if (capital.isNotBlank()) openMeteoClient.geocode(capital)?.results?.firstOrNull() else null
+        val geo = if (capital.isNotBlank()) {
+            tracedCall(countryCode, "open-meteo.geocode") {
+                openMeteoClient.geocode(capital)?.results?.firstOrNull()
+            }
+        } else {
+            log.info("Skipping geocoding for country={} because capital is blank", countryCode)
+            null
+        }
+
         val forecast = if (geo?.latitude != null && geo.longitude != null) {
-            openMeteoClient.getCurrentWeather(geo.latitude, geo.longitude)
+            tracedCall(countryCode, "open-meteo.forecast") {
+                openMeteoClient.getCurrentWeather(geo.latitude, geo.longitude)
+            }
         } else null
 
-        val gdp = worldBankClient.getLatestIndicatorValue(country.cca2 ?: "", "NY.GDP.PCAP.CD")
-        val life = worldBankClient.getLatestIndicatorValue(country.cca2 ?: "", "SP.DYN.LE00.IN")
-        val co2 = worldBankClient.getLatestIndicatorValue(country.cca2 ?: "", "EN.ATM.CO2E.PC")
+        val gdp = tracedCall(countryCode, "world-bank.NY.GDP.PCAP.CD") {
+            worldBankClient.getLatestIndicatorValue(countryCode, "NY.GDP.PCAP.CD")
+        }
+        val life = tracedCall(countryCode, "world-bank.SP.DYN.LE00.IN") {
+            worldBankClient.getLatestIndicatorValue(countryCode, "SP.DYN.LE00.IN")
+        }
+        val co2 = tracedCall(countryCode, "world-bank.EN.ATM.CO2E.PC") {
+            worldBankClient.getLatestIndicatorValue(countryCode, "EN.ATM.CO2E.PC")
+        }
 
         return CountrySnapshot(
-            countryCode = country.cca2 ?: "UNKNOWN",
+            countryCode = countryCode,
             countryName = country.name?.common ?: "Unknown",
             capital = capital,
             region = country.region,
@@ -126,5 +173,35 @@ class CountryIngestionService(
                 worldBankFetchedAt = fetchedAt
             )
         )
+    }
+
+    private fun <T> tracedCall(countryCode: String, source: String, block: () -> T): T {
+        return try {
+            block()
+        } catch (ex: RestClientResponseException) {
+            val responseBody = ex.responseBodyAsString
+                ?.replace("\n", " ")
+                ?.take(500)
+                ?: "<empty>"
+
+            log.error(
+                "External call failed country={} source={} status={} body={}",
+                countryCode,
+                source,
+                ex.statusCode.value(),
+                responseBody,
+                ex,
+            )
+            throw ex
+        } catch (ex: Exception) {
+            log.error(
+                "External call failed country={} source={} message={}",
+                countryCode,
+                source,
+                ex.message,
+                ex,
+            )
+            throw ex
+        }
     }
 }

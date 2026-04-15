@@ -168,6 +168,16 @@ Aplikacja używa Spring Boot Actuator endpoints (jeśli włączone):
 - Health check: `/actuator/health`
 - Info: `/actuator/info`
 
+Dodatkowo backend posiada logowanie diagnostyczne dla procesu odświeżania danych kraju (`POST /api/countries/{code}/refresh`).
+
+W logach znajdziesz:
+
+- rozpoczęcie i zakończenie ręcznego odświeżenia,
+- nazwę źródła zewnętrznego API, które zgłosiło błąd,
+- status HTTP i fragment odpowiedzi zwróconej przez zewnętrzne API.
+
+To jest podstawowe miejsce diagnostyki, gdy frontend pokazuje błąd odświeżania lub backend zwraca `400/500`.
+
 ## Dalsze Kroki
 
 - [Dokumentacja API - endpoints, parametry, przykłady](./API.md)

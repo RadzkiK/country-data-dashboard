@@ -62,15 +62,29 @@ export default function DashboardPage() {
     try {
       setIsRefreshing(true);
       setErrorMessage(null);
-      await Promise.all(selectedCodes.map((code) => refreshCountry(code)));
+
+      const refreshResults = await Promise.allSettled(
+        selectedCodes.map((code) => refreshCountry(code)),
+      );
+      const failedCodes = refreshResults.flatMap((result, index) =>
+        result.status === "rejected" ? [selectedCodes[index]] : [],
+      );
+
       const [allCountries, comparedCountries] = await Promise.all([
         getCountries(),
         compareCountries(selectedCodes),
       ]);
+
       setCountries(allCountries);
       setCompared(comparedCountries);
+
+      if (failedCodes.length > 0) {
+        setErrorMessage(
+          `Nie udało się odświeżyć danych dla: ${failedCodes.join(", ")}. Pozostałe dane zostały pobrane ponownie.`,
+        );
+      }
     } catch {
-      setErrorMessage("Odświeżenie danych nie powiodło się.");
+      setErrorMessage("Odświeżenie danych nie powiodło się. Nie udało się ponownie pobrać widoku.");
     } finally {
       setIsRefreshing(false);
     }

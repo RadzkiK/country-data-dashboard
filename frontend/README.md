@@ -1,73 +1,34 @@
-# React + TypeScript + Vite
+# Frontend Country Data Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend aplikacji prezentuje dane o państwach w dwóch głównych widokach:
 
-Currently, two official plugins are available:
+- dashboard do wyboru i szybkiego porównania krajów,
+- widok szczegółowego porównania z wykresami i historią danych.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Projekt został zbudowany w oparciu o React 19, TypeScript, Vite oraz Recharts.
 
-## React Compiler
+## Dokumentacja
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Szczegółowa dokumentacja znajduje się w katalogu `docs`:
 
-## Expanding the ESLint configuration
+- `docs/README.md` - indeks dokumentacji
+- `docs/ARCHITEKTURA.md` - architektura, routing i przepływ danych
+- `docs/KOMPONENTY.md` - opis stron, komponentów i odpowiedzialności
+- `docs/API_FRONTEND.md` - integracja z backendem i normalizacja danych
+- `docs/URUCHOMIENIE.md` - uruchomienie, budowanie i konfiguracja
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Szybki start
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Domyślnie frontend oczekuje backendu pod adresem `http://localhost:8080/api`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Skrypty
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- `npm run dev` - uruchamia środowisko developerskie Vite
+- `npm run build` - wykonuje sprawdzenie TypeScript i buduje aplikację
+- `npm run lint` - uruchamia ESLint
+- `npm run preview` - uruchamia podgląd zbudowanej aplikacji

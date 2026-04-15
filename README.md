@@ -1,260 +1,148 @@
 # Country Data Dashboard
 
-## Opis projektu
+Country Data Dashboard to aplikacja webowa typu monorepo, która agreguje dane o państwach z zewnętrznych źródeł, zapisuje historyczne snapshoty w MongoDB i udostępnia je w formie dashboardu oraz widoku porównawczego.
 
-**Country Data Dashboard** to projekt zaliczeniowy z przedmiotu **„Systemy akwizycji i przetwarzania danych”**. Celem projektu jest zbudowanie kompletnej aplikacji webowej, która:
+Projekt składa się z trzech głównych elementów:
 
-- pobiera dane z **3 zewnętrznych API**,
-- agreguje i przetwarza te dane po stronie backendu,
-- zapisuje wyniki w bazie danych **MongoDB**,
-- udostępnia własne API dla warstwy frontendowej,
-- prezentuje dane w formie czytelnego dashboardu z elementami graficznymi.
+- backendu w Kotlinie i Spring Boot, który pobiera, normalizuje i udostępnia dane,
+- frontendu w React i TypeScript, który wizualizuje dane oraz umożliwia porównywanie krajów,
+- bazy MongoDB przechowującej bieżące i historyczne snapshoty.
 
-Aplikacja umożliwia porównywanie wybranych państw pod względem danych ogólnych, pogody w stolicy oraz podstawowych wskaźników społeczno-ekonomicznych.
+## Najważniejsze funkcje
 
----
+- pobieranie danych o krajach z wielu zewnętrznych API,
+- agregacja danych geograficznych, pogodowych i ekonomicznych,
+- przechowywanie historii snapshotów w MongoDB,
+- REST API do pobierania listy krajów, porównań i historii,
+- dashboard z wyborem do trzech krajów,
+- szczegółowy widok porównawczy z wykresami i tabelą.
 
-## Cel projektu
+## Architektura
 
-Projekt realizuje typowy scenariusz systemu akwizycji i przetwarzania danych:
+System ma prostą architekturę trójwarstwową:
 
-1. **Akwizycja danych** z wielu zewnętrznych źródeł.
-2. **Transformacja i normalizacja** pobranych danych do wspólnego modelu.
-3. **Składowanie danych** w bazie noSQL.
-4. **Udostępnienie danych** poprzez własne REST API.
-5. **Wizualizacja danych** w aplikacji frontendowej.
+1. Frontend renderuje dane i obsługuje interakcję użytkownika.
+2. Backend integruje się z zewnętrznymi API, składa odpowiedzi i zapisuje snapshoty.
+3. MongoDB przechowuje dane historyczne i najnowsze odczyty.
 
-
----
-
-## Zakres funkcjonalny
-
-Planowana aplikacja będzie umożliwiać:
-
-- pobranie danych dla wybranego kraju,
-- zapis zagregowanych danych do bazy MongoDB,
-- odczyt zapisanych danych przez backend,
-- porównanie kilku krajów na dashboardzie,
-- wyświetlenie podstawowych informacji o kraju,
-- prezentację wskaźników na wykresach.
-
-Minimalny zakres funkcjonalny obejmuje:
-
-- listę krajów,
-- szczegóły pojedynczego kraju,
-- endpoint do odświeżenia danych,
-- widok porównawczy dla 2–3 państw,
-- prosty dashboard frontendowy.
-
----
-
-## Wybrane zewnętrzne API
-
-W projekcie zostaną użyte trzy niezależne zewnętrzne API:
-
-### 1. REST Countries
-Źródło podstawowych informacji o państwach.
-
-Pobierane dane:
-- nazwa kraju,
-- kod kraju,
-- stolica,
-- region,
-- populacja,
-- powierzchnia,
-- flaga,
-- języki,
-- waluty.
-
-### 2. Open-Meteo
-Źródło danych pogodowych dla stolic państw.
-
-Pobierane dane:
-- aktualna temperatura,
-- prędkość wiatru,
-- kod pogodowy,
-- czas obserwacji.
-
-### 3. World Bank Indicators API
-Źródło danych statystycznych i ekonomicznych.
-
-Planowane wskaźniki:
-- GDP per capita,
-- life expectancy,
-- CO2 emissions per capita.
-
----
-
-## Wybrane technologie
-
-Projekt zostanie zrealizowany z użyciem następujących technologii:
+## Technologie
 
 ### Backend
-- **Kotlin** – główny język backendu
-- **Spring Boot** – framework do budowy REST API
-- **Spring Data MongoDB** – warstwa dostępu do danych
-- **Gradle** – system budowania projektu
 
-### Baza danych
-- **MongoDB** – dokumentowa baza danych noSQL
-- opcjonalnie **MongoDB Compass** – narzędzie do podglądu danych
+- Kotlin 2.3.20
+- Spring Boot 4.1.0-M3
+- Spring Web MVC
+- Spring Data MongoDB
+- Gradle
+- Java 21
 
 ### Frontend
-- **React** – biblioteka do budowy interfejsu użytkownika
-- **Vite** – szybkie środowisko uruchomieniowe i build frontendowy
-### Narzędzia dodatkowe
-- **GitHub** – repozytorium projektu
-- **Docker / Docker Compose** – uruchamianie MongoDB lokalnie
 
----
+- React 19
+- TypeScript 5
+- Vite 8
+- Axios
+- React Router
+- Recharts
 
-## Przygotowane środowisko w GitHub
+### Infrastruktura
 
-Projekt jest planowany jako repozytorium typu **monorepo** zawierające backend, frontend oraz dokumentację techniczną.
+- MongoDB 8
+- Docker Compose do lokalnego uruchomienia bazy
 
-### Nazwa repozytorium
+## Źródła danych
 
-`country-data-dashboard`
+Backend korzysta z trzech zewnętrznych źródeł danych:
 
-https://github.com/RadzkiK/country-data-dashboard
+- REST Countries
+- Open-Meteo
+- World Bank Indicators API
 
-### Proponowana struktura katalogów
+## Struktura repozytorium
 
 ```text
 country-data-dashboard/
   backend/
   frontend/
   docs/
+  docker-compose.yml
   README.md
-  .gitignore
 ```
 
-### Zakładana organizacja repozytorium
+- `backend/` - aplikacja Spring Boot i dokumentacja techniczna backendu
+- `frontend/` - aplikacja React oraz dokumentacja techniczna frontendu
+- `docs/` - dodatkowe pliki pomocnicze repozytorium
+- `docker-compose.yml` - lokalne uruchomienie MongoDB
 
-- `backend/` – aplikacja Spring Boot w Kotlinie,
-- `frontend/` – aplikacja React + Vite,
-- `docs/` – diagramy, screenshoty, dokumentacja projektu,
-- `README.md` – opis projektu i instrukcja uruchomienia,
+## Szybki start
 
+### 1. Uruchom MongoDB
 
----
+W katalogu głównym repozytorium:
 
-## Architektura rozwiązania
-
-Projekt będzie miał klasyczną architekturę trójwarstwową:
-
-1. **Frontend** – warstwa prezentacji danych.
-2. **Backend** – warstwa logiki, integracji z API i agregacji danych.
-3. **MongoDB** – warstwa przechowywania danych.
-
----
-
-## Opis bazy danych
-
-W projekcie zostanie zastosowana dokumentowa baza danych **MongoDB**.
-
-Zamiast klasycznego modelu relacyjnego SQL zostanie użyty model dokumentowy, w którym głównym bytem jest zagregowany dokument reprezentujący jeden kraj wraz z osadzonymi danymi pogodowymi i ekonomicznymi.
-
-### Główna kolekcja
-
-- `country_dashboards`
-
-### Przykładowy dokument
-
-```json
-{
-  "id": "...",
-  "countryCode": "PL",
-  "name": "Poland",
-  "capital": "Warsaw",
-  "region": "Europe",
-  "population": 38000000,
-  "area": 312696,
-  "flagUrl": "https://...",
-  "languages": ["Polish"],
-  "currencies": ["Polish zloty"],
-  "weather": {
-    "temperature": 12.4,
-    "windSpeed": 18.1,
-    "weatherCode": 3,
-    "observationTime": "2026-03-18T10:00:00Z"
-  },
-  "indicators": {
-    "gdpPerCapita": 22112.33,
-    "lifeExpectancy": 78.5,
-    "co2PerCapita": 7.9,
-    "year": 2024
-  },
-  "sourceMetadata": {
-    "restCountriesFetchedAt": "2026-03-18T10:15:00",
-    "openMeteoFetchedAt": "2026-03-18T10:15:10",
-    "worldBankFetchedAt": "2026-03-18T10:15:20"
-  },
-  "lastUpdated": "2026-03-18T10:15:20"
-}
+```bash
+docker compose up -d
 ```
 
+Domyślnie MongoDB będzie dostępne na porcie `27017`.
 
-## Logiczny model danych
+### 2. Uruchom backend
 
-W sensie logicznym model można opisać następująco:
+W katalogu `backend`:
 
-- `CountryDashboard` – główny dokument agregujący dane o kraju,
-- `WeatherSnapshot` – osadzony subdokument z danymi pogodowymi,
-- `IndicatorSnapshot` – osadzony subdokument ze wskaźnikami,
-- opcjonalnie `RefreshLog` – osobna kolekcja logów odświeżania danych.
-
-Relacje mają charakter **logiczny**, a nie relacyjny w sensie klasycznych baz SQL.
-
----
-
-## Diagram modelu danych w Mermaid
-
-```mermaid
-classDiagram
-    class CountryDashboard {
-        String id
-        String countryCode
-        String name
-        String capital
-        String region
-        Long population
-        Double area
-        String flagUrl
-        List~String~ languages
-        List~String~ currencies
-        LocalDateTime lastUpdated
-    }
-
-    class WeatherSnapshot {
-        Double temperature
-        Double windSpeed
-        Integer weatherCode
-        String observationTime
-    }
-
-    class IndicatorSnapshot {
-        Double gdpPerCapita
-        Double lifeExpectancy
-        Double co2PerCapita
-        Integer year
-    }
-
-    class SourceMetadata {
-        LocalDateTime restCountriesFetchedAt
-        LocalDateTime openMeteoFetchedAt
-        LocalDateTime worldBankFetchedAt
-    }
-
-    class RefreshLog {
-        String id
-        String countryCode
-        String status
-        LocalDateTime refreshTime
-    }
-
-    CountryDashboard --> WeatherSnapshot : embeds
-    CountryDashboard --> IndicatorSnapshot : embeds
-    CountryDashboard --> SourceMetadata : embeds
-    CountryDashboard --> RefreshLog : optional reference
+```bash
+./gradlew bootRun
 ```
+
+Na Windows można użyć:
+
+```bash
+gradlew.bat bootRun
+```
+
+Backend będzie dostępny pod adresem `http://localhost:8080`.
+
+### 3. Uruchom frontend
+
+W katalogu `frontend`:
+
+```bash
+npm install
+npm run dev
+```
+
+Frontend komunikuje się z backendem pod adresem `http://localhost:8080/api`.
+
+## Najważniejsze endpointy backendu
+
+- `GET /api/countries` - lista krajów z najnowszymi snapshotami
+- `GET /api/countries/grouped` - kraje pogrupowane po regionach
+- `GET /api/countries/{code}` - dane pojedynczego kraju
+- `POST /api/countries/{code}/refresh` - ręczne odświeżenie danych kraju
+- `GET /api/countries/compare?codes=PL,DE,CZ` - porównanie wybranych krajów
+- `GET /api/countries/{code}/history?limit=30` - historia danych kraju
+
+## Dokumentacja
+
+### Backend
+
+- [backend/docs/README.md](backend/docs/README.md)
+- [backend/docs/API.md](backend/docs/API.md)
+- [backend/docs/MODELS.md](backend/docs/MODELS.md)
+- [backend/docs/CLIENTS.md](backend/docs/CLIENTS.md)
+
+### Frontend
+
+- [frontend/README.md](frontend/README.md)
+- [frontend/docs/README.md](frontend/docs/README.md)
+- [frontend/docs/ARCHITEKTURA.md](frontend/docs/ARCHITEKTURA.md)
+- [frontend/docs/KOMPONENTY.md](frontend/docs/KOMPONENTY.md)
+- [frontend/docs/API_FRONTEND.md](frontend/docs/API_FRONTEND.md)
+- [frontend/docs/URUCHOMIENIE.md](frontend/docs/URUCHOMIENIE.md)
+
+## Uwagi techniczne
+
+- frontend ma na stałe ustawiony bazowy adres API `http://localhost:8080/api`,
+- backend zapisuje snapshoty danych w MongoDB,
+- frontend normalizuje odpowiedzi backendu, żeby defensywnie obsługiwać różne formaty czasu i brakujące tablice,
+- część dokumentacji w repo opisuje stan techniczny bardziej szczegółowo niż główny README.
